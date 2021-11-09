@@ -1,0 +1,5 @@
+<project name="LiveVis" default="python">
+        <target name="python" >
+                <exec executable="./src/main.py" failifexecutionfails="true" failonerror="true"/>
+        </target>
+</project>
