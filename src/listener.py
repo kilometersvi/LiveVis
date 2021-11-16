@@ -32,11 +32,12 @@ class Listener:
                 for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
                 data = stream.read(CHUNK)
                 self.frames.put(data)
-                
+
                 #memory management
                 mem_usage = sys.getsizeof(frames)
                 if self.sleep_time>0:
                     time.sleep(self.sleep_time)
+                
             while(not self.do_record):
                 time.sleep(0.2)
 
