@@ -297,39 +297,7 @@ class IntervalStream(threading.Thread):
                     if len(self.bpmhist) > 3:
                         self.bpmhist.pop(0)
 
-                '''
-                curr_bpm = librosa.beat.tempo(y=prior_frames.arr, sr=self.audiohandler.RATE)[0]
-
-                #converge on bpm
-                if self.bpm == -1:
-                    self.bpm = curr_bpm
-                    self.bpmhist.append(curr_bpm)
-
-                elif len(self.bpmhist)==1:
-                    self.bpmhist.append(curr_bpm)
-                    self.bpm = mean(self.bpmhist)
-
-                else:
-                    standev = stdev(self.bpmhist)
-
-                    #catch miscalculations in bpm (twice expected, half expected)
-                    if curr_bpm > self.bpm + standev:
-                        if (curr_bpm / 2 < self.bpm + standev) and (curr_bpm / 2 > self.bpm - standev):
-                            self.bpmhist.append(curr_bpm / 2)
-                        else:
-                            self.bpmhist.append(curr_bpm)
-                    if curr_bpm < self.bpm - standev:
-                        if (curr_bpm * 2 < self.bpm + standev) and (curr_bpm * 2 > self.bpm - standev):
-                            self.bpmhist.append(curr_bpm * 2)
-                        else:
-                            self.bpmhist.append(curr_bpm)
-
-                    self.bpm = mean(self.bpmhist)
-
-                    #prevent bpmhist from growing too large
-                    if len(self.bpmhist) > 10:
-                        self.bpmhist.pop(0)
-                '''
+            
 
 
                 #calculate frames per interval. 1/( bpm beats/minute )*60seconds/min * 4beats/measure * 44100 frames/second = frames/measure, *= interval = frames/interval

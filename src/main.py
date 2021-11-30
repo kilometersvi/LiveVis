@@ -4,6 +4,5 @@ from mainview import MainWindow
 
 if __name__ == "__main__":
     load_dotenv()
-    #SoundUtil.EnableJackD2()
 
     w = MainWindow()

@@ -9,6 +9,7 @@ from layers.full_color import FullColor
 from layers.color_mix_2split import ColorMix2Split
 from layers.split4 import Split4
 from layers.checker import Checkerboard
+from layers.moving import Move
 from sound import IntervalStream, IntervalSample
 
 class LayerHandler:
@@ -23,8 +24,8 @@ class LayerHandler:
         return current
 
     @staticmethod
-    def randomLayers(possibleLayers, weights):
-        randNum = random.randint(2, len(possibleLayers)-2)
+    def randomLayers(possibleLayers, weights,reduceBy=2):
+        randNum = random.randint(2, len(possibleLayers)-reduceBy)
 
         #print(f"possibleLayers: {possibleLayers}, randNum: {randNum}")
 
@@ -58,8 +59,6 @@ class LayerHandler:
         if ftoi:
             frame = (frame * 255).astype('uint8')
         if cv2Show:
-            print(f"frame dtype: {frame.dtype}")
-
             cv2.imshow( "LiveVis", frame)
         else:
             return frame
@@ -82,20 +81,24 @@ class LayerController(threading.Thread):
 
         #ColorMix2Split()
         self.possibleLayers = [
-            Checkerboard(),
-            Checkerboard(config={'numSquares':8, 'thickness':2, 'colorRand':True}),
+            Checkerboard(config={'useTime':True}),
+            Checkerboard(config={'useTime':True, 'numSquares':8, 'thickness':2, 'colorRand':True}),
             Split4(),
             Split4(),
             Split4(),
+            Move(config={'vertical':'down'}),
+            Move(config={'horizontal':'left'}),
             ColorMix2Split()
         ]
         self.weights = [
-            2,
+            3,
+            3,
             1,
             1,
             1,
             1,
-            2
+            1,
+            3
         ]
         self.layers = [FullColor(config={'color':(0.5,0.5,0.5,1.0)})]
 
@@ -121,7 +124,6 @@ class LayerController(threading.Thread):
                 currentFrame = LayerHandler.combineLayers(self.layers,params={'n':self.n})
                 #self.frames.put(LayerHandler.preprocess(currentFrame))
                 #self.frames.put(LayerHandler.preprocess(LayerHandler.combineLayers(self.layers,params={'n':self.n})))
-                print(currentFrame.shape)
 
                 while self.IntervalStream.data_queue.qsize() > 0:
                     self.IntervalStream.data_queue.get()
@@ -129,7 +131,7 @@ class LayerController(threading.Thread):
                 LayerHandler.Show(currentFrame, ftoi=True, cv2Show=True)
 
                 if (self.n!=0) and (self.n%(self.resolution*2)==0):
-                    self.layers = LayerHandler.randomLayers(self.possibleLayers, self.weights)
+                    self.layers = LayerHandler.randomLayers(self.possibleLayers, self.weights, reduceBy=5)
                     print(f"frame time: {self.frameTime}, meter length: {self.meter_length}, layers: {self.layers}")
 
 
@@ -151,7 +153,11 @@ class LayerController(threading.Thread):
                 #    break
             else:
 
-                self.layers = [FullColor(config={'color':(0,0,0,1.0)})]
+
+                self.layers = [FullColor(config={'color':(0.,0.,0.,1.0)})]
+                currentFrame = LayerHandler.combineLayers(self.layers,params={'n':self.n})
+                LayerHandler.Show(currentFrame, ftoi=True, cv2Show=True)
+
                 time.sleep(0.1)
 
 
