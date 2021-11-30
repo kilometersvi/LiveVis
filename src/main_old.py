@@ -18,6 +18,8 @@ if __name__ == "__main__":
     frame_front = np.zeros((d[0],d[1],4), np.uint8)
     frame_front[:,:,3] = np.ones((d[0],d[1]))*255;
     n = 0.0;
+
+    print(frame_back.shape)
     while True:
 
         v1 = math.sin(n/10)

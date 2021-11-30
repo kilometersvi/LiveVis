@@ -1,37 +1,49 @@
-import cv2
 from abc import ABC, abstractmethod
 
-class LayerFrame:
 
-    def __init__(self, layer):
-        self.layer = layer
+class Layer(ABC):
 
+    def __init__(self, n_l=0, config={}, dims=(600,800)):
 
-    def __add__(self, o):
-        return layer.effect(o)
+        self.n_l = n_l
+        self.config = config
+        self.dims = dims
 
-class Layer:
+        super().__init__()
 
-    def __init__(self, n=0):
-        self.n = n
-        self.frame =
+    #all must return frame of shape(dims[0],dims[1],4) of type float32
+    @abstractmethod
+    def compute(self, current=None, params={}):
+        pass
 
-    def __iter__(self):
-        random.shuffle(self.all_data)
-        batch = list()
-        for i in self.all_data:
-            batch.append(i)
-            if len(batch) >= self.size:
-                yield batch
-                batch = list()
-
-    def __call__(self, n):
-        self.n = n
-        return self
-
-    def run(self):
-
-    def effect(self, o):
+'''
+    def effectAdd(self, o=None):
         frame = cv2.addWeighted(self.frame,1,o.frame,1,0)
         return frame;
-        #return self.a + o.a
+'''
+
+class ColorShifter:
+    def __init__(self, timeVariance=0.5, timeSpeed=0.3):
+        self.timeVariance = timeVariance
+        self.timeSpeed = timeSpeed
+
+        self.n_l = 0
+
+    def __getitem__(self, indices):
+        mod = (math.sin(self.n_l*self.timeSpeed)*self.timeVariance + (1-self.timeVariance),
+                math.cos(self.n_l*self.timeSpeed)*self.timeVariance + (1-self.timeVariance),
+                math.sin(self.n_l*self.timeSpeed)*self.timeVariance + (1-self.timeVariance)
+                )
+        return mod[indices]
+
+    def increment_n(self):
+        self.n_l += 1
+
+class ColorTools:
+    @staticmethod
+    def floorceil(color):
+        color_new = ((int)(min(254,max(1,color[0]))),
+                     (int)(min(254,max(1,color[1]))),
+                     (int)(min(254,max(1,color[2])))
+                     )
+        return color_new
